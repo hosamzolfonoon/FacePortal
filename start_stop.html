@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Capture</title>
+</head>
+<body>
+    <h1>Video Capture Example</h1>
+    <div id="video-controls">
+        <!-- Start, Stop, and Capture buttons -->
+        <button id="start-video">Start Video</button>
+        <button id="stop-video">Stop Video</button>
+        <button id="capture-frame">Capture</button>
+    </div>
+    <div id="video-container">
+        <!-- Video display -->
+        <video id="video-stream" autoplay muted playsinline style="width: 640px; height: 480px; border: 1px solid  #ccc;"></video>
+    </div>
+    <div id="capture-container">
+        <!-- Canvas for captured frame -->
+        <canvas id="capture-canvas" style="width: 100%; max-width: 640px; border: 1px solid #ccc; display: none;"></canvas>
+    </div>
+
+    <!-- Link to external JavaScript -->
+    <script src="video-capture.js"></script>
+</body>
+</html>

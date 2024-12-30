@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Webcam Frame Sender</title>
+</head>
+<body>
+  <h1>Send Webcam Frames to Server</h1>
+  <video id="video" autoplay muted></video>
+
+  <!-- Input fields for additional parameters -->
+  <label>
+    Process Duration (seconds):
+    <input id="processDuration" type="number" step="0.1" value="30">
+  </label>
+  <br>
+  <label>
+    Frame Rate (frames per second):
+    <input id="frameRate" type="number" step="1" value="4">
+  </label>
+  <br>
+  <label>
+    Detection Threshold:
+    <input id="detectionThreshold" type="number" step="0.01" value="30">
+  </label>
+  <br><br>
+
+  <button id="start">Start Sending Frames</button>
+  <button id="stop">Stop Sending Frames</button>
+
+  <script>
+    const video = document.getElementById("video");
+    let sendingFrames = false;
+
+    // Request access to webcam
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        video.srcObject = stream;
+      })
+      .catch(err => console.error("Error accessing webcam: ", err));
+
+    // Start sending frames
+    document.getElementById("start").addEventListener("click", () => {
+      sendingFrames = true;
+      sendFrames();
+    });
+
+    // Stop sending frames
+    document.getElementById("stop").addEventListener("click", () => {
+      sendingFrames = false;
+    });
+
+    async function sendFrames() {
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+
+      // Collect parameters
+      const processDuration = parseFloat(document.getElementById("processDuration").value);
+      const frameRate = parseInt(document.getElementById("frameRate").value, 10);
+      const detectionThreshold = parseFloat(document.getElementById("detectionThreshold").value);
+
+      const frameInterval = 1000 / frameRate; // Convert frame rate to milliseconds
+
+      while (sendingFrames) {
+        // Capture a frame from the video
+        canvas.width = video.videoWidth; // Get the video width
+        canvas.height = video.videoHeight; // Get the video height
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Convert the frame to base64
+        const imageData = canvas.toDataURL("image/jpeg");
+
+        // Get the current timestamp
+        const timestamp = Date.now();
+
+        // Send the frame to the server with additional parameters
+        // consider https for video
+        try {
+          const response = await fetch("https://dataanalyst.pt/ferapp/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              image: imageData,
+              timestamp: timestamp,
+              process_duration: processDuration,
+              frame_rate: frameRate,
+              detection_threshold: detectionThreshold,
+              dimensions: {
+                width: canvas.width,
+                height: canvas.height
+              }
+            })
+          });
+          const result = await response.json();
+          console.log("Server Response:", result);
+        } catch (error) {
+          console.error("Error sending frame:", error);
+        }
+
+        // Wait according to the frame rate before sending the next frame
+        await new Promise(resolve => setTimeout(resolve, frameInterval));
+      }
+    }
+  </script>
+</body>
+</html>

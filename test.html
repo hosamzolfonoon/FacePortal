@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Webcam Frame Sender</title>
+</head>
+<body>
+  <h1>Send Webcam Frames to Server</h1>
+  <video id="video" autoplay muted></video>
+
+  <!-- Input fields for additional parameters -->
+  <label>
+    Process Duration (seconds):
+    <input id="processDuration" type="number" step="0.1" value="1">
+  </label>
+  <br>
+  <label>
+    Frame Rate (frames per second):
+    <input id="frameRate" type="number" step="1" value="10">
+  </label>
+  <br>
+  <label>
+    Detection Threshold:
+    <input id="detectionThreshold" type="number" step="0.01" value="0.5">
+  </label>
+  <br><br>
+
+  <button id="start">Start Sending Frames</button>
+  <button id="stop">Stop Sending Frames</button>
