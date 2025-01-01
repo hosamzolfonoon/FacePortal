@@ -152,7 +152,6 @@ def prediction_face(model_mlp, model_svm, model_rf, model_dt, X_img_face, predic
         prediction_message_list.append(prediction_message)
     return prediction_message_list
 
-
 def models_running_face():
     ### I you want to check especiasl emoptions consider emotion_folder_list ###
     model_dnn = tf.keras.models.load_model('/ferapp/FER_DNN.keras')
@@ -162,7 +161,6 @@ def models_running_face():
     model_dt = joblib.load('/ferapp/DT_Face.pkl')
     return model_dnn, model_mlp, model_svm, model_rf, model_dt
 
-
 def put_text_face(img, predict_message_final, width_in, height_in):
     font_scale =.7 #  round(0.0009 * width_in)
     height = round(height_in * 0.8)
@@ -170,10 +168,6 @@ def put_text_face(img, predict_message_final, width_in, height_in):
     for i in range(len(predict_message_final)):
         cv2.putText(img, predict_message_final[i], (round(0.2*width_in), height), cv2.FONT_HERSHEY_PLAIN, fontScale=font_scale, color=(0,0,0), thickness=1)
         height += round(height_line_space/5)
-
-
-
-
 
 def predict_message_final_face_df_function (face_df_array, predict_message_final_face):
     global ml_list
@@ -188,8 +182,6 @@ def predict_message_final_face_df_function (face_df_array, predict_message_final
             face_df_array_hlep[0,counter_face_df] = emotion_help
     face_df_array = np.concatenate((face_df_array, face_df_array_hlep))
     return face_df_array
-
-
 
 def prediction_dnn(model, X_img, prediction_message):
     prediction_message_list = []
@@ -210,7 +202,6 @@ def prediction_dnn(model, X_img, prediction_message):
         prediction_message_list.append('***  FER DNN  ***' )
         prediction_message_list.append(prediction_message)
     return prediction_message_list
-
 
 def predict_message_final_face_df_function_dnn (face_df_array, predict_message_list_dnn):
     global ml_list_dnn
@@ -236,8 +227,6 @@ def put_text_face_dnn(img, predict_message_list, width_in, height_in):
             j = i-4
             cv2.putText(img, predict_message_list[i], (round(0.58*width_in), height+j*round(height_line_space/5)), cv2.FONT_HERSHEY_PLAIN, fontScale=font_scale, color=(0,0,0), thickness=1)
 
-
-
 prev_landmarks = None
 prev_directions = None
 prev_time = None
@@ -248,14 +237,11 @@ ml_list_dnn = ['DNN']
 check = False
 color_list = ['blue','orange','green','red','purple','brown','pink','gray','olive','cyan'] # Definition color lists
 duration_time = 0
-pulse_counter = 1 # Variable for rows in another word it is assumed like df index
 pTime = 0 # Auxiliary variable, # Hyperparameter to control FPS
 face_detection_counter = 0
-detector_bpm = FaceMechDetector(refine_landmarks=False, staticMode=False)
 model_dnn, model_mlp_face, model_svm_face, model_rf_face, model_dt_face = models_running_face()
 face_df_array = np.empty((1, len(ml_list)), dtype='object')
 face_df_array_dnn = np.empty((1, len(ml_list_dnn)), dtype='object')
-body_df_array = np.empty((1, len(ml_list)), dtype='object')
 
 app = Flask(__name__)
 
@@ -267,8 +253,7 @@ def upload():
     global ml_list, ml_list_dnn
     global prev_landmarks, prev_directions, prev_time, duration_time
     global df_help_1, df_help_2, columns_list
-    global detector_bpm
-    global check, color_list, pulse_counter, pTime, face_detection_counter
+    global check, color_list, pTime, face_detection_counter
 
     try:
         # Parse JSON data
@@ -280,9 +265,7 @@ def upload():
 
         if duration_time < process_duration:
             # Extract parameters
-            current_frame_timestamp = data['timestamp']
             frame_rate = data['frame_rate']
-            detection_threshold = data['detection_threshold']
             dimensions = data['dimensions']
             width_in = dimensions['width']
             height_in = dimensions['height']
@@ -314,7 +297,6 @@ def upload():
                 #face_df_array_dnn = predict_message_final_face_df_function_dnn (face_df_array_dnn, predict_message_list_dnn)
                 put_text_face(img, predict_message_final_face, width_in, height_in)
                 put_text_face_dnn(img, predict_message_list_dnn, width_in, height_in)
-                pulse_counter += 1
 
                 return jsonify({
                     "predict_message_final_face": predict_message_final_face,
