@@ -206,16 +206,29 @@ endif;
 add_action( 'init', 'twentytwentyfour_pattern_categories' );
 
 function enqueue_video_scripts() {
-    // Load video-capture.js on "Page One"
+    // Check if the current page is "Video" and enqueue the corresponding script
     if (is_page('Video')) {
-        wp_enqueue_script('video-capture', get_template_directory_uri() . '/video-capture.js', [], null, true);
+        wp_enqueue_script(
+            'video-capture', // Handle for the script
+            get_template_directory_uri() . '/video-capture.js', // Path to the script
+            [], // Dependencies (none in this case)
+            null, // Version (null to prevent caching issues during development)
+            true // Load in the footer
+        );
     }
 
-    // Load video-capture-service.js on "Page Two"
-    if (is_page('FER Service')) {
-        wp_enqueue_script('video-capture-service', get_template_directory_uri() . '/video-capture-service.js', [], null, true);
+    // Check if the current page is "Face Portal" and enqueue the corresponding script
+    if (is_page('Face Portal')) {
+        wp_enqueue_script(
+            'video-capture-service', // Handle for the script
+            get_template_directory_uri() . '/video-capture-service.js', // Path to the script
+            [], // Dependencies (none in this case)
+            null, // Version (null to prevent caching issues during development)
+            true // Load in the footer
+        );
     }
 }
 add_action('wp_enqueue_scripts', 'enqueue_video_scripts');
+
 
 

@@ -1,53 +1,55 @@
+// Select DOM elements
 const video = document.getElementById('video-stream');
 const canvas = document.getElementById('capture-canvas');
 const captureButton = document.getElementById('capture-frame');
 const startButton = document.getElementById('start-video');
 const stopButton = document.getElementById('stop-video');
 
-let stream;
-let captureInterval;
-let captureTimeout; // To track the 30-second timeout
+let stream = null; // To store the media stream
+let captureInterval = null; // For repeated frame capturing
+let captureTimeout = null; // To track the 30-second timeout
 
-// Start video
+// Start video stream
 startButton.addEventListener('click', async () => {
     try {
+        // Request access to the user's webcam
         stream = await navigator.mediaDevices.getUserMedia({ video: true });
         video.srcObject = stream;
+        console.log("Video stream started.");
     } catch (error) {
         console.error("Error accessing video stream:", error);
+        alert("Could not access the webcam. Please check your permissions.");
     }
 });
 
-// Stop video
+// Stop video stream
 stopButton.addEventListener('click', () => {
-    stopCapturing(); // Call the stopCapturing function to clear intervals and timeouts
     try {
+        stopCapturing(); // Stop capturing frames
         if (stream) {
+            // Stop all media tracks
             stream.getTracks().forEach(track => track.stop());
             video.srcObject = null;
+            console.log("Video stream stopped.");
         } else {
             console.warn("No active video stream to stop.");
         }
     } catch (error) {
-        console.error("Error stopping video stream:", error);
+        console.error("Error occurred while stopping the video stream:", error);
+        alert("An error occurred while trying to stop the video stream. Please try again.");
     }
 });
 
 // Capture frame and send to the server
 captureButton.addEventListener('click', () => {
-    if (captureInterval) {
-        clearInterval(captureInterval); // Clear any existing interval
-    }
-    if (captureTimeout) {
-        clearTimeout(captureTimeout); // Clear any existing timeout
-    }
+    // Clear existing intervals or timeouts if any
+    if (captureInterval) clearInterval(captureInterval);
+    if (captureTimeout) clearTimeout(captureTimeout);
 
     // Start capturing frames every second
-    captureInterval = setInterval(() => {
-        captureAndSendFrame();
-    }, 1000); // 1000ms = 1 second
+    captureInterval = setInterval(captureAndSendFrame, 1000); // 1000ms = 1 second
 
-    // Stop capturing automatically after 30 seconds
+    // Automatically stop capturing after 30 seconds
     captureTimeout = setTimeout(() => {
         stopCapturing();
         console.log("Stopped capturing after 30 seconds.");
@@ -56,49 +58,50 @@ captureButton.addEventListener('click', () => {
 
 // Function to capture and send a frame
 function captureAndSendFrame() {
-    const canvas = document.createElement('canvas');
-    canvas.width = 640;
-    canvas.height = 480;
-    const context = canvas.getContext('2d');
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    // Create a new canvas element for each capture
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = 640;
+    tempCanvas.height = 480;
+    const context = tempCanvas.getContext('2d');
 
-    // Convert canvas to Base64
-    const base64Image = canvas.toDataURL('image/jpeg');
+    // Draw the current video frame onto the canvas
+    context.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
 
-    // Create JSON payload
+    // Convert canvas image to Base64
+    const base64Image = tempCanvas.toDataURL('image/jpeg');
+
+    // Prepare the JSON payload
     const jsonPayload = {
         image: base64Image,
         process_duration: 30,
         frame_rate: 1, // 1 frame per second
         dimensions: {
-            width: canvas.width,
-            height: canvas.height,
+            width: tempCanvas.width,
+            height: tempCanvas.height,
         },
     };
 
-    // Send JSON payload to the server
-    fetch('https://dataanalyst.pt/faceapp/', {
+    // Send the payload to the server
+    fetch('https://dataanalyst.pt/faceportal/', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(jsonPayload),
     })
-    .then((response) => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then((data) => {
-        console.log("Server response:", data);
-    })
-    .catch((error) => {
-        console.error("Error sending data to the server:", error);
-    });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Network response was not ok: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Server response:", data);
+        })
+        .catch(error => {
+            console.error("Error sending data to the server:", error);
+        });
 }
 
-// Function to stop capturing
+// Function to stop capturing frames
 function stopCapturing() {
     if (captureInterval) {
         clearInterval(captureInterval);
@@ -108,5 +111,5 @@ function stopCapturing() {
         clearTimeout(captureTimeout);
         captureTimeout = null;
     }
-    console.log("Capturing stopped.");
+    console.log("Frame capturing stopped.");
 }
