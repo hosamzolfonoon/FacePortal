@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: faceportal
+  name: ferapp
   labels:
-    app: faceportal
+    app: ferapp
 spec:
   type: NodePort
   ports:
@@ -11,15 +11,15 @@ spec:
       nodePort: 30010
       targetPort: 8000  # Replace with the port your app runs on inside the pod
   selector:
-    app: faceportal
+    app: ferapp
     tier: frontend
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: faceportal-pv
+  name: ferapp-pv
   labels:
-    app: faceportal
+    app: ferapp
 spec:
   capacity:
     storage: 10Gi
@@ -33,9 +33,9 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: faceportal-pv-claim
+  name: ferapp-pv-claim
   labels:
-    app: faceportal
+    app: ferapp
 spec:
   accessModes:
     - ReadWriteOnce
@@ -47,41 +47,34 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: faceportal
+  name: ferapp
   labels:
-    app: faceportal
+    app: ferapp
 spec:
   replicas: 1 # Specify the number of replicas for the deployment
   selector:
     matchLabels:
-      app: faceportal
+      app: ferapp
       tier: frontend
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: faceportal
+        app: ferapp
         tier: frontend
     spec:
       containers:
-        - name: faceportal
+        - name: ferapp
           image: hosamzolfonoon/faceportal:latest
           command: ["nginx", "-g", "daemon off;"] # Keeps Nginx running in the foreground
           ports:
             - containerPort: 80
               name: http
-          resources:
-            requests:
-              memory: "2Gi"
-              cpu: "1"
-            limits:
-              memory: "4Gi"
-              cpu: "2"
           volumeMounts:
-            - name: faceportal-persistent-storage
+            - name: ferapp-persistent-storage
               mountPath: /var/www/html
       volumes:
-        - name: faceportal-persistent-storage
+        - name: ferapp-persistent-storage
           persistentVolumeClaim:
-            claimName: faceportal-pv-claim
+            claimName: ferapp-pv-claim

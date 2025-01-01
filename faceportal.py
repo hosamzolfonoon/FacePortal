@@ -248,11 +248,9 @@ app = Flask(__name__)
 @app.route('/', methods=['POST'])
 def upload():
     global model_dnn, model_mlp_face, model_svm_face, model_rf_face, model_dt_face
-    global model_mlp_body, model_svm_body, model_rf_body, model_dt_body
-    global face_df_array, face_df_array_dnn, body_df_array
+    global face_df_array, face_df_array_dnn
     global ml_list, ml_list_dnn
     global prev_landmarks, prev_directions, prev_time, duration_time
-    global df_help_1, df_help_2, columns_list
     global check, color_list, pTime, face_detection_counter
 
     try:
