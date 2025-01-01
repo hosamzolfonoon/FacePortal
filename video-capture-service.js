@@ -77,7 +77,7 @@ function captureAndSendFrame() {
     };
 
     // Send JSON payload to the server
-    fetch('https://faceportal30010', {
+    fetch('https://dataanalyst.pt/faceapp/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
