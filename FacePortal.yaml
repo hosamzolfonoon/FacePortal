@@ -71,13 +71,6 @@ spec:
           ports:
             - containerPort: 80
               name: http
-          resources:
-            requests:
-              memory: "2Gi" # Request 2 GiB of memory
-              cpu: "1" # Request 1 CPU
-            limits:
-              memory: "4Gi" # Limit to 4 GiB of memory
-              cpu: "2" # Limit to 2 CPUs
           volumeMounts:
             - name: faceportal-persistent-storage
               mountPath: /var/www/html
