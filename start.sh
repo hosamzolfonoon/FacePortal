@@ -7,4 +7,4 @@ echo "Reloading Nginx..."
 nginx -s reload
 
 echo "Starting Gunicorn server..."
-gunicorn -w 3 --bind 0.0.0.0:8000 --daemon faceportal:app
+gunicorn -w 1 --bind 0.0.0.0:8000 --daemon faceportal:app
