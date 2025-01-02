@@ -4,9 +4,6 @@ from datetime import datetime
 import time
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.dates import SecondLocator
-import seaborn as sns
 import warnings
 import joblib
 import tensorflow as tf
@@ -47,6 +44,8 @@ class FaceMechDetector():
                         face_landmarks_dict[id] = [x, y]
         return face_landmarks_dict
 
+# Disable all warnings
+warnings.filterwarnings("ignore")
 
 
 detector_face = FaceMechDetector(staticMode=False)
@@ -256,7 +255,7 @@ def upload():
     try:
         # Parse JSON data
         data = request.json
-        required_fields = ['image', 'timestamp', 'process_duration', 'frame_rate', 'detection_threshold', 'dimensions']
+        required_fields = ['image', 'process_duration', 'frame_rate', 'dimensions']
         if not all(field in data for field in required_fields):
             return jsonify({"error": "Invalid request format"}), 400
         process_duration = data['process_duration']

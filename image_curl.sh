@@ -13,6 +13,7 @@ JSON_PAYLOAD=$(mktemp)
 cat <<EOF > "$JSON_PAYLOAD"
 {
   "image": "data:image/jpeg;base64,$BASE64_IMAGE",
+  "process_duration": 30,
   "frame_rate": 1,
   "dimensions": {
     "width": 640,
